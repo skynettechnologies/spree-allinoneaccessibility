@@ -1,0 +1,93 @@
+en:
+  activemodel:
+    attributes:
+      spree_all_in_one_accessibility/widget_settings:
+        widget_color_code: Hex color code
+        widget_position: Widget position
+        custom_position_x: Horizontal offset
+        custom_position_x_direction: Horizontal direction
+        custom_position_y: Vertical offset
+        custom_position_y_direction: Vertical direction
+        widget_size: Widget size
+        widget_icon_type: Icon type
+        widget_icon_size: Icon size
+        widget_icon_size_custom: Exact icon size
+  spree:
+    admin:
+      all_in_one_accessibility:
+        nav_label: All in One Accessibility
+        title: All in One Accessibility®
+        description: Add the All in One Accessibility widget to your storefront and customize how it looks.
+        save: Save changes
+        saved: Widget settings saved.
+        domain_changed: Domain saved. The widget settings of %{domain} are shown below.
+        changes_delay_note: It may take a few seconds for changes to appear on your storefront. If you don't see them, clear your browser cache or check in a private browsing window.
+        errors_heading: 'Please fix the following:'
+        opens_in_new_tab: (opens in a new tab)
+        invalid_domain: Enter a valid domain, for example shop.example.com.
+        invalid_license_key: The license key can contain only letters, numbers, dots, dashes and underscores.
+        api_error: All in One Accessibility could not be reached, so the widget settings were not saved. Please try again in a few minutes.
+        api_unavailable: The widget settings could not be loaded from All in One Accessibility, so the defaults are shown. Please try again in a few minutes.
+        registration_pending: "%{domain} is being registered for the free widget. Reload this page in a few seconds to load its settings."
+        storefront:
+          title: Storefront
+          enabled: Show the accessibility widget on the storefront
+          enabled_help: Adds the widget to every page of the Spree Rails storefront.
+          domain: Website domain
+          domain_help: The domain your customers visit, for example shop.example.com. The settings below are saved for this domain.
+          license_key: License key
+          license_key_help: Only needed for a paid plan. Leave empty for the free widget.
+          headless_snippet: Script for headless storefronts
+          headless_snippet_help: Using the Next.js storefront or another headless storefront? Add this script tag before the closing body tag of its layout.
+        color:
+          title: Widget color
+          label: Hex color code
+          help: 'You can customize the widget color. For example: #FF5733'
+          picker: Pick a color
+        position:
+          title: Widget position
+          custom_toggle: Enable precise accessibility widget icon position
+          legend: Where would you like to place the accessibility icon on your site?
+          top_left: Top left
+          top_center: Top center
+          top_right: Top right
+          middel_left: Middle left
+          middel_right: Middle right
+          bottom_left: Bottom left
+          bottom_center: Bottom center
+          bottom_right: Bottom right
+          horizontal: Horizontal offset
+          vertical: Vertical offset
+          right: To the right
+          left: To the left
+          bottom: To the bottom
+          top: To the top
+          direction: Direction
+          custom_help: 0 - 250px are permitted values.
+        widget_size:
+          title: Widget size
+          regular: Regular size
+          oversize: Oversize
+          help: Oversize only applies to the desktop view.
+        icon_type:
+          title: Icon type
+          option: Icon type %{number}
+        icon_size:
+          title: Icon size
+          custom_toggle: Enable icon custom size
+          legend: Select icon size for desktop
+          aioa-big-icon: Big
+          aioa-medium-icon: Medium
+          aioa-default-icon: Default
+          aioa-small-icon: Small
+          aioa-extra-small-icon: Extra small
+          custom_label: Exact icon size
+          custom_help: 20 - 150px are permitted values.
+          preview: Preview
+        upgrade:
+          eyebrow: Free plan active
+          stat: With 24 features
+          text_html: Upgrade to unlock <strong>90+ premium accessibility features</strong> and make your website even more inclusive.
+          button: Upgrade to paid plan
+          trial: 10 days free trial · Cancel anytime
+          note_html: "<strong>Note:</strong> All in One Accessibility is dedicated to enhancing accessibility specifically for websites and online stores."

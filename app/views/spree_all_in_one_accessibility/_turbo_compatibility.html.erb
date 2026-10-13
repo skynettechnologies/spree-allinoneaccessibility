@@ -1,0 +1,43 @@
+<%#
+  The widget starts once per page load: when Turbo Drive replaces <body>, the widget disappears
+  and its scripts do not run again. Link navigations therefore load the next page normally.
+  Form results and back/forward restores still replace <body> (a page load would drop flash
+  messages and validation errors), so the widget elements are moved into the new <body>.
+%>
+<%= javascript_tag nonce: true do %>
+  (function () {
+    if (window.aioaTurboCompatibility) return;
+    window.aioaTurboCompatibility = true;
+
+    var formVisitPending = false;
+
+    document.addEventListener('turbo:submit-start', function () {
+      formVisitPending = true;
+    });
+
+    document.addEventListener('turbo:submit-end', function (event) {
+      var response = event.detail.fetchResponse;
+      if (!event.detail.success || !response || !response.redirected) formVisitPending = false;
+    });
+
+    document.addEventListener('turbo:before-prefetch', function (event) {
+      event.preventDefault();
+    });
+
+    document.addEventListener('turbo:before-visit', function (event) {
+      if (formVisitPending) {
+        formVisitPending = false;
+        return;
+      }
+      event.preventDefault();
+      window.location.assign(event.detail.url);
+    });
+
+    document.addEventListener('turbo:before-render', function (event) {
+      var newBody = event.detail.newBody;
+      document.querySelectorAll('body > .aioa-widget-wrapper, body > [id^="accessibility_"]').forEach(function (element) {
+        newBody.appendChild(element);
+      });
+    });
+  })();
+<% end %>

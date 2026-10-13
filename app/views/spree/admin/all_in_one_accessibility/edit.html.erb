@@ -1,0 +1,279 @@
+<% settings = @widget_settings %>
+<% klass = SpreeAllInOneAccessibility::WidgetSettings %>
+
+<% content_for :page_title do %>
+  <%= aioa_t(:title) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%= button_tag aioa_t(:save), type: 'submit', form: 'aioa-settings-form', class: 'btn btn-primary', data: { admin_target: 'save' } %>
+<% end %>
+
+<%= render 'styles' %>
+
+<div class="aioa-settings" data-aioa-settings style="--aioa-widget-color: <%= settings.color_picker_value %>">
+  <p class="aioa-lead"><%= aioa_t(:description) %></p>
+
+  <% if @alert %>
+    <div class="alert alert-<%= @alert[:type] %> aioa-alert aioa-alert--<%= @alert[:type] %>" role="alert">
+      <%= @alert[:message] %>
+    </div>
+  <% end %>
+
+  <% if settings.errors.any? %>
+    <div class="alert alert-danger aioa-alert aioa-alert--danger" role="alert">
+      <p><strong><%= aioa_t(:errors_heading) %></strong></p>
+      <ul>
+        <% settings.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= render 'upgrade_banner' if settings.is_free_widget %>
+
+  <%= form_with url: spree.admin_all_in_one_accessibility_path, method: :patch, id: 'aioa-settings-form',
+                html: { novalidate: true }, data: { turbo: false } do %>
+    <%= hidden_field_tag 'widget_settings[is_free_widget]', settings.is_free_widget ? '1' : '0', id: nil %>
+
+    <%# Storefront integration (saved on the store) %>
+    <section class="card aioa-card" aria-labelledby="aioa-storefront-title">
+      <div class="card-header">
+        <h4 class="card-title aioa-card-title" id="aioa-storefront-title"><%= aioa_t('storefront.title') %></h4>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <div class="custom-control custom-checkbox form-checkbox">
+            <%= hidden_field_tag 'all_in_one_accessibility[enabled]', '0', id: nil %>
+            <%= check_box_tag 'all_in_one_accessibility[enabled]', '1', @enabled,
+                              id: 'aioa-enabled', class: 'custom-control-input', 'aria-describedby': 'aioa-enabled-help' %>
+            <label class="custom-control-label" for="aioa-enabled"><%= aioa_t('storefront.enabled') %></label>
+          </div>
+          <p class="form-text" id="aioa-enabled-help"><%= aioa_t('storefront.enabled_help') %></p>
+        </div>
+
+        <div class="form-group">
+          <label for="aioa-domain"><%= aioa_t('storefront.domain') %></label>
+          <%= text_field_tag 'all_in_one_accessibility[domain]', @domain, id: 'aioa-domain',
+                             class: 'form-control form-input aioa-input-md', list: 'aioa-domain-suggestions',
+                             autocomplete: 'off', spellcheck: false, 'aria-describedby': 'aioa-domain-help' %>
+          <datalist id="aioa-domain-suggestions">
+            <% @domain_suggestions.each do |suggestion| %>
+              <option value="<%= suggestion %>"></option>
+            <% end %>
+          </datalist>
+          <p class="form-text" id="aioa-domain-help"><%= aioa_t('storefront.domain_help') %></p>
+        </div>
+
+        <%# Hidden for now: the saved license key is still submitted and kept. Remove `hidden` to show the field. %>
+        <div class="form-group" hidden>
+          <label for="aioa-license-key"><%= aioa_t('storefront.license_key') %></label>
+          <%= text_field_tag 'all_in_one_accessibility[license_key]', @license_key, id: 'aioa-license-key',
+                             class: 'form-control form-input aioa-input-md', autocomplete: 'off', spellcheck: false,
+                             'aria-describedby': 'aioa-license-key-help' %>
+          <p class="form-text" id="aioa-license-key-help"><%= aioa_t('storefront.license_key_help') %></p>
+        </div>
+
+        <div class="form-group">
+          <label for="aioa-snippet"><%= aioa_t('storefront.headless_snippet') %></label>
+          <% snippet_url = SpreeAllInOneAccessibility::WidgetScript.url(token: @license_key) %>
+          <%= text_area_tag nil, %(<script id="#{SpreeAllInOneAccessibility::WidgetScript::ELEMENT_ID}" src="#{snippet_url}" defer></script>),
+                            id: 'aioa-snippet', rows: 3, readonly: true, class: 'form-control form-input aioa-snippet',
+                            'aria-describedby': 'aioa-snippet-help' %>
+          <p class="form-text" id="aioa-snippet-help"><%= aioa_t('storefront.headless_snippet_help') %></p>
+        </div>
+      </div>
+    </section>
+
+    <%# Widget color %>
+    <section class="card aioa-card" aria-labelledby="aioa-color-title">
+      <div class="card-header">
+        <h4 class="card-title aioa-card-title" id="aioa-color-title"><%= aioa_t('color.title') %></h4>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="aioa-color"><%= aioa_t('color.label') %></label>
+          <div class="aioa-color-row">
+            <input type="color" id="aioa-color-picker" class="aioa-color-picker" value="<%= settings.color_picker_value %>"
+                   aria-label="<%= aioa_t('color.picker') %>">
+            <%= text_field_tag 'widget_settings[widget_color_code]', settings.widget_color_code, id: 'aioa-color',
+                               class: 'form-control form-input', maxlength: 7, autocomplete: 'off', spellcheck: false,
+                               **aioa_field_aria(settings, :widget_color_code, 'aioa-color-help') %>
+          </div>
+          <p class="form-text" id="aioa-color-help"><%= aioa_t('color.help') %></p>
+          <%= aioa_field_error(settings, :widget_color_code) %>
+        </div>
+      </div>
+    </section>
+
+    <%# Widget position %>
+    <section class="card aioa-card" aria-labelledby="aioa-position-title">
+      <div class="card-header">
+        <h4 class="card-title aioa-card-title" id="aioa-position-title"><%= aioa_t('position.title') %></h4>
+      </div>
+      <div class="card-body">
+        <div class="form-group aioa-toggle">
+          <div class="custom-control custom-checkbox form-checkbox">
+            <%= hidden_field_tag 'widget_settings[is_widget_custom_position]', '0', id: nil %>
+            <%= check_box_tag 'widget_settings[is_widget_custom_position]', '1', settings.is_widget_custom_position,
+                              id: 'aioa-custom-position', class: 'custom-control-input',
+                              data: { aioa_show: 'aioa-custom-position-panel', aioa_hide: 'aioa-preset-position-panel' },
+                              'aria-controls': 'aioa-custom-position-panel aioa-preset-position-panel' %>
+            <label class="custom-control-label" for="aioa-custom-position"><%= aioa_t('position.custom_toggle') %></label>
+          </div>
+        </div>
+
+        <div id="aioa-custom-position-panel" <%= 'hidden' unless settings.is_widget_custom_position %>>
+          <% [
+               [:custom_position_x, :custom_position_x_direction, 'horizontal', klass::X_DIRECTIONS],
+               [:custom_position_y, :custom_position_y_direction, 'vertical', klass::Y_DIRECTIONS]
+             ].each do |offset, direction, label, directions| %>
+            <div class="aioa-offset-row">
+              <div class="form-group">
+                <label for="aioa-<%= offset %>"><%= aioa_t("position.#{label}") %></label>
+                <div class="aioa-input-unit">
+                  <%= number_field_tag "widget_settings[#{offset}]", settings.public_send(offset), id: "aioa-#{offset}",
+                                       min: klass::CUSTOM_OFFSET_RANGE.min, max: klass::CUSTOM_OFFSET_RANGE.max, step: 1,
+                                       class: 'form-control form-input',
+                                       **aioa_field_aria(settings, offset, 'aioa-offset-help') %>
+                  <span class="aioa-unit" aria-hidden="true">px</span>
+                </div>
+                <%= aioa_field_error(settings, offset) %>
+              </div>
+              <div class="form-group">
+                <label for="aioa-<%= direction %>"><%= aioa_t('position.direction') %></label>
+                <%= select_tag "widget_settings[#{direction}]",
+                               options_for_select(directions.map { |value| [aioa_t("position.#{value}"), value] }, settings.public_send(direction)),
+                               id: "aioa-#{direction}", class: 'form-control form-select custom-select' %>
+                <%= aioa_field_error(settings, direction) %>
+              </div>
+            </div>
+          <% end %>
+          <p class="form-text" id="aioa-offset-help"><%= aioa_t('position.custom_help') %></p>
+        </div>
+
+        <fieldset id="aioa-preset-position-panel" class="aioa-fieldset" <%= 'hidden' if settings.is_widget_custom_position %>>
+          <legend class="aioa-legend"><%= aioa_t('position.legend') %></legend>
+          <div class="aioa-position-grid">
+            <% klass::POSITIONS.each do |position| %>
+              <div class="custom-control custom-radio aioa-position aioa-position--<%= position %>">
+                <%= radio_button_tag 'widget_settings[widget_position]', position, settings.widget_position == position,
+                                     id: "aioa-position-#{position}", class: 'custom-control-input form-radio' %>
+                <label class="custom-control-label" for="aioa-position-<%= position %>"><%= aioa_t("position.#{position}") %></label>
+              </div>
+            <% end %>
+          </div>
+          <%= aioa_field_error(settings, :widget_position) %>
+        </fieldset>
+      </div>
+    </section>
+
+    <%# Widget size %>
+    <section class="card aioa-card" aria-labelledby="aioa-widget-size-title">
+      <div class="card-header">
+        <h4 class="card-title aioa-card-title" id="aioa-widget-size-title"><%= aioa_t('widget_size.title') %></h4>
+      </div>
+      <div class="card-body">
+        <div class="aioa-inline-options" role="radiogroup" aria-labelledby="aioa-widget-size-title" aria-describedby="aioa-widget-size-help">
+          <% { 0 => 'regular', 1 => 'oversize' }.each do |value, label| %>
+            <div class="custom-control custom-radio">
+              <%= radio_button_tag 'widget_settings[widget_size]', value, settings.widget_size.to_i == value,
+                                   id: "aioa-widget-size-#{value}", class: 'custom-control-input form-radio' %>
+              <label class="custom-control-label" for="aioa-widget-size-<%= value %>"><%= aioa_t("widget_size.#{label}") %></label>
+            </div>
+          <% end %>
+        </div>
+        <p class="form-text" id="aioa-widget-size-help"><%= aioa_t('widget_size.help') %></p>
+        <%= aioa_field_error(settings, :widget_size) %>
+      </div>
+    </section>
+
+    <%# Icon type %>
+    <section class="card aioa-card" aria-labelledby="aioa-icon-type-title">
+      <div class="card-header">
+        <h4 class="card-title aioa-card-title" id="aioa-icon-type-title"><%= aioa_t('icon_type.title') %></h4>
+      </div>
+      <div class="card-body">
+        <div class="aioa-tiles aioa-tiles--types" role="radiogroup" aria-labelledby="aioa-icon-type-title">
+          <% klass::ICON_TYPES.each.with_index(1) do |icon_type, number| %>
+            <div class="aioa-tile">
+              <%= radio_button_tag 'widget_settings[widget_icon_type]', icon_type, settings.widget_icon_type == icon_type,
+                                   id: "aioa-#{icon_type}", class: 'aioa-tile-input' %>
+              <label class="aioa-tile-label" for="aioa-<%= icon_type %>">
+                <%= tag.img src: settings.icon_url(icon_type), alt: aioa_t('icon_type.option', number: number),
+                            width: 65, height: 65, loading: 'lazy' %>
+              </label>
+            </div>
+          <% end %>
+        </div>
+        <%= aioa_field_error(settings, :widget_icon_type) %>
+      </div>
+    </section>
+
+    <%# Icon size %>
+    <section class="card aioa-card" aria-labelledby="aioa-icon-size-title">
+      <div class="card-header">
+        <h4 class="card-title aioa-card-title" id="aioa-icon-size-title"><%= aioa_t('icon_size.title') %></h4>
+      </div>
+      <div class="card-body">
+        <div class="form-group aioa-toggle">
+          <div class="custom-control custom-checkbox form-checkbox">
+            <%= hidden_field_tag 'widget_settings[is_widget_custom_size]', '0', id: nil %>
+            <%= check_box_tag 'widget_settings[is_widget_custom_size]', '1', settings.is_widget_custom_size,
+                              id: 'aioa-custom-size', class: 'custom-control-input',
+                              data: { aioa_show: 'aioa-custom-size-panel', aioa_hide: 'aioa-preset-size-panel' },
+                              'aria-controls': 'aioa-custom-size-panel aioa-preset-size-panel' %>
+            <label class="custom-control-label" for="aioa-custom-size"><%= aioa_t('icon_size.custom_toggle') %></label>
+          </div>
+        </div>
+
+        <fieldset id="aioa-preset-size-panel" class="aioa-fieldset" <%= 'hidden' if settings.is_widget_custom_size %>>
+          <legend class="aioa-legend"><%= aioa_t('icon_size.legend') %></legend>
+          <div class="aioa-tiles aioa-tiles--sizes">
+            <% klass::ICON_SIZES.each do |icon_size, pixels| %>
+              <div class="aioa-tile">
+                <%= radio_button_tag 'widget_settings[widget_icon_size]', icon_size, settings.widget_icon_size == icon_size,
+                                     id: "aioa-#{icon_size}", class: 'aioa-tile-input', data: { aioa_pixels: pixels } %>
+                <label class="aioa-tile-label" for="aioa-<%= icon_size %>">
+                  <%= tag.img src: settings.icon_url, alt: "#{aioa_t("icon_size.#{icon_size}")} (#{pixels}px)",
+                              width: pixels, height: pixels, class: 'aioa-icon-preview' %>
+                </label>
+              </div>
+            <% end %>
+          </div>
+          <%= aioa_field_error(settings, :widget_icon_size) %>
+        </fieldset>
+
+        <div id="aioa-custom-size-panel" class="aioa-custom-size" <%= 'hidden' unless settings.is_widget_custom_size %>>
+          <div class="form-group">
+            <label for="aioa-icon-size-custom"><%= aioa_t('icon_size.custom_label') %></label>
+            <div class="aioa-input-unit">
+              <%= number_field_tag 'widget_settings[widget_icon_size_custom]', settings.widget_icon_size_custom,
+                                   id: 'aioa-icon-size-custom', min: klass::CUSTOM_SIZE_RANGE.min,
+                                   max: klass::CUSTOM_SIZE_RANGE.max, step: 1, class: 'form-control form-input',
+                                   **aioa_field_aria(settings, :widget_icon_size_custom, 'aioa-icon-size-custom-help') %>
+              <span class="aioa-unit" aria-hidden="true">px</span>
+            </div>
+            <p class="form-text" id="aioa-icon-size-custom-help"><%= aioa_t('icon_size.custom_help') %></p>
+            <%= aioa_field_error(settings, :widget_icon_size_custom) %>
+          </div>
+          <figure class="aioa-preview">
+            <div class="aioa-preview-box">
+              <%= tag.img src: settings.icon_url, alt: '', width: settings.preview_size, height: settings.preview_size,
+                          id: 'aioa-custom-size-preview', class: 'aioa-icon-preview' %>
+            </div>
+            <figcaption><%= aioa_t('icon_size.preview') %>: <span id="aioa-custom-size-value"><%= settings.preview_size %></span>px</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <p class="aioa-note"><%= aioa_t(:changes_delay_note) %></p>
+    <div class="aioa-actions">
+      <%= button_tag aioa_t(:save), type: 'submit', class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+</div>
+
+<%= render 'script' %>

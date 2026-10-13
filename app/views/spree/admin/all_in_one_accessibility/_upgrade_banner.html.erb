@@ -1,0 +1,29 @@
+<section class="aioa-upgrade" aria-labelledby="aioa-upgrade-title">
+  <svg class="aioa-upgrade-watermark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+    <path d="M12 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zm7 7.5c0 .8-.6 1.5-1.5 1.5H15v3.2l2.4 6.4a1.2 1.2 0 0 1-2.2.9L13 15.5h-2L8.8 20.5a1.2 1.2 0 0 1-2.2-.9L9 13.2V10H6.5A1.5 1.5 0 0 1 5 8.5V8a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v1.5z"/>
+  </svg>
+
+  <div class="aioa-upgrade-inner">
+    <span class="aioa-upgrade-eyebrow"><%= aioa_t('upgrade.eyebrow') %></span>
+
+    <div class="aioa-upgrade-top">
+      <div class="aioa-upgrade-left">
+        <h4 class="aioa-upgrade-stat" id="aioa-upgrade-title"><%= aioa_t('upgrade.stat') %></h4>
+        <p class="aioa-upgrade-text"><%= aioa_t('upgrade.text_html') %></p>
+      </div>
+      <%= link_to 'https://ada.skynettechnologies.us/trial-subscription', class: 'aioa-upgrade-btn', target: '_blank', rel: 'noopener' do %>
+        <%= aioa_t('upgrade.button') %>
+        <span class="aioa-sr-only"><%= aioa_t(:opens_in_new_tab) %></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      <% end %>
+    </div>
+    <p class="aioa-upgrade-trial"><%= aioa_t('upgrade.trial') %></p>
+
+    <div class="aioa-upgrade-divider"></div>
+
+    <p class="aioa-upgrade-note"><%= aioa_t('upgrade.note_html') %></p>
+  </div>
+</section>

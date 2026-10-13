@@ -1,0 +1,8 @@
+<%# Rendered at the end of <body> on every Rails storefront page. Can also be rendered in a custom layout. %>
+<% aioa_store_settings = SpreeAllInOneAccessibility::StoreSettings.new(current_store) %>
+<% if aioa_store_settings.enabled? %>
+  <%= tag.script nil, id: SpreeAllInOneAccessibility::WidgetScript::ELEMENT_ID,
+                      src: SpreeAllInOneAccessibility::WidgetScript.url(token: aioa_store_settings.license_key),
+                      defer: true, data: { turbo_permanent: true } %>
+  <%= render 'spree_all_in_one_accessibility/turbo_compatibility' %>
+<% end %>

@@ -1,0 +1,11 @@
+require 'spree_core'
+require 'spree_admin'
+
+require 'spree_all_in_one_accessibility/version'
+require 'spree_all_in_one_accessibility/configuration'
+require 'spree_all_in_one_accessibility/domain'
+require 'spree_all_in_one_accessibility/widget_settings'
+require 'spree_all_in_one_accessibility/widget_script'
+require 'spree_all_in_one_accessibility/api_client'
+require 'spree_all_in_one_accessibility/store_settings'
+require 'spree_all_in_one_accessibility/engine'

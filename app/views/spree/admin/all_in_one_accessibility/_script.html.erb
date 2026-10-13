@@ -1,0 +1,70 @@
+<%= javascript_tag nonce: true do %>
+  (function () {
+    var root = document.querySelector('[data-aioa-settings]');
+    if (!root) return;
+
+    var hexColor = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+    var iconBaseUrl = 'https://www.skynettechnologies.com/sites/default/files/';
+
+    // Show the custom position/size controls instead of the predefined options.
+    root.querySelectorAll('[data-aioa-show]').forEach(function (checkbox) {
+      var sync = function () {
+        var show = document.getElementById(checkbox.dataset.aioaShow);
+        var hide = document.getElementById(checkbox.dataset.aioaHide);
+        if (show) show.hidden = !checkbox.checked;
+        if (hide) hide.hidden = checkbox.checked;
+      };
+      checkbox.addEventListener('change', sync);
+      sync();
+    });
+
+    // Keep the color text field and the color picker in sync, and preview the color on the icons.
+    var colorText = document.getElementById('aioa-color');
+    var colorPicker = document.getElementById('aioa-color-picker');
+    var applyColor = function (value) { root.style.setProperty('--aioa-widget-color', value); };
+
+    colorPicker.addEventListener('input', function () {
+      colorText.value = colorPicker.value.toUpperCase();
+      applyColor(colorPicker.value);
+    });
+    colorText.addEventListener('input', function () {
+      var value = colorText.value.trim();
+      if (!hexColor.test(value)) return;
+      value = value.replace('#', '');
+      if (value.length === 3) value = value.replace(/(.)/g, '$1$1');
+      colorPicker.value = '#' + value.toLowerCase();
+      applyColor('#' + value);
+    });
+
+    // Icon size previews show the selected icon type.
+    root.querySelectorAll('input[name="widget_settings[widget_icon_type]"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        root.querySelectorAll('.aioa-icon-preview').forEach(function (image) {
+          image.src = iconBaseUrl + radio.value + '.svg';
+        });
+      });
+    });
+
+    // Custom icon size preview.
+    var sizeInput = document.getElementById('aioa-icon-size-custom');
+    var sizePreview = document.getElementById('aioa-custom-size-preview');
+    var sizeValue = document.getElementById('aioa-custom-size-value');
+    var syncSize = function () {
+      var size = parseInt(sizeInput.value, 10);
+      if (size >= 20 && size <= 150) {
+        sizePreview.width = size;
+        sizePreview.height = size;
+        sizeValue.textContent = size;
+      }
+    };
+    sizeInput.addEventListener('input', syncSize);
+
+    // Choosing a predefined size pre-fills the custom size with it.
+    root.querySelectorAll('input[name="widget_settings[widget_icon_size]"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        sizeInput.value = radio.dataset.aioaPixels;
+        syncSize();
+      });
+    });
+  })();
+<% end %>
